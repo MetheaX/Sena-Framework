@@ -17,7 +17,7 @@
         <inject.version>1</inject.version>
         <apache.commons.version>3.20.0</apache.commons.version>
         <apache.commons.collection.version>4.5.0</apache.commons.collection.version>
-        <jackson-databind.version>3.0.4</jackson-databind.version>
+        <jackson-databind.version>3.1.2</jackson-databind.version>
         <jwt.version>10.7</jwt.version>
         <apache.commons.bean.version>1.9.4</apache.commons.bean.version>
         <apache.commons.text.version>1.15.0</apache.commons.text.version>
@@ -62,8 +62,8 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.83</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -79,6 +79,12 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${apache.common.io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson-databind.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>tools.jackson.core</groupId>

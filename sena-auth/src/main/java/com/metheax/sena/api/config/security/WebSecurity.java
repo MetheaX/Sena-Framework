@@ -49,7 +49,7 @@ public class WebSecurity {
         http.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry
                         -> authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/auth/**", "/error").permitAll()
                                 .requestMatchers("/**").authenticated())
                 .addFilter(new WebServiceAuthorizationFilter(metheaAuthenticationService, authManager(http),
                         keyStoreService, whiteURIPermissionRepository))
