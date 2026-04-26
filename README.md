@@ -16,6 +16,7 @@ A companion [UI Management Tool](https://github.com/MetheaX/methea-management) i
 - **Public URI whitelist** — selectively expose endpoints without authentication
 - **Session management** — server-side session tracking with token revocation support
 - **Spring Data JPA auditing** — automatic `createdBy` / `updatedBy` population
+- **Support Boot Starter Web** - `web-flux` coming out
 
 ---
 
@@ -354,25 +355,30 @@ create table public.core_session_management
 
 ```sql
 INSERT INTO core_account VALUES ('68bcf443-1b0c-49ff-877e-8650477383e8', NOW(), 'System', 'A', NOW(), 'System',
-    'Phnom Penh, Cambodia.', 'METHEA', 'methea@localhost.com', 'Methea LLC.', 'មេធា');
+    'Phnom Penh, Cambodia.', 'METHEA', 'methea@localhost.com', 'MetheaX LLC.', 'មេធា');
 
 INSERT INTO core_group VALUES ('366a7028-b623-49b0-8988-d711647051a5', NOW(), 'System', 'A', NOW(), 'System',
     'M_SYS_ADMIN', 'System Admin', 'អេតមីនប្រព័ន្ធ', null, '68bcf443-1b0c-49ff-877e-8650477383e8');
 
-INSERT INTO core_resource VALUES ('ad5ea55c-547a-4537-8797-e3714c64d8a3', NOW(), 'System', 'A', NOW(), 'System', '/**');
+INSERT INTO public.core_resource (resource_id, created_date_time, created_user, status, updated_date_time, updated_user, resource_name) VALUES ('ad5ea55c-547a-4537-8797-e3714c64d8a3', '2021-06-13 10:57:36.748761', 'System', 'A', '2021-06-13 10:57:36.748761', 'System', '/**');
+INSERT INTO public.core_resource (resource_id, created_date_time, created_user, status, updated_date_time, updated_user, resource_name) VALUES ('b04ba160-1336-4aa1-8c9f-71b67cf7047d', '2026-04-26 13:22:38.000000', 'System', 'A', '2026-04-26 13:22:46.000000', 'System', '/api/test');
 
 INSERT INTO core_role VALUES ('33525a14-0ebc-4a3e-ada5-bd3ef94c9495', NOW(), 'System', 'A', NOW(), 'System',
     'ROLE_ADMIN', 'Admin', 'អេតមីន');
 
-INSERT INTO core_user VALUES ('c6eff227-d496-486c-a72c-db2f92e06faa', NOW(), 'System', 'A', NOW(), 'System',
-    'admin@localhost.com', 'Admin', 'អេតមីន', 'N', '639691', 'Admin', 'អេតមីន',
-    'Gp/lBVv1VTKk3DLGiENtX4Ow1xLEUqIDRBpa+zuTJWT3IIqfC4m0SB1tpVDo1+BQHFnY90XmvbJE1JAMDfRSmA$vkDevdjMM9v+/BonOi6HX/+v3Syh5mrSMXssz5707LSlOrCiIj3O7Q50bg7mLeCl6GYKhad7GGQi7CKvP1KqnbvtS2eZMFevVHsYHsQD2UeMQqiP7nAQ1z12ZHMNc5QckXZgUPMqetTzhJMzDduJ9+nOrC3HlqSo43VoMg0k+EA',
-    '+85569639691', 'admin', '366a7028-b623-49b0-8988-d711647051a5');
+INSERT INTO public.core_user (user_id, created_date_time, created_user, status, updated_date_time, updated_user, email, first_name, first_name_oth, frc_usr_rst_pwd, identity_code, last_name, last_name_oth, password, phone, username, group_id) VALUES ('c6eff227-d496-486c-a72c-db2f92e06faa', '2021-06-13 10:57:37.015455', 'System', 'A', '2021-06-13 10:57:37.015455', 'System', 'admin@localhost.com', 'Admin', 'អេតមីន', 'N', '639691', 'Admin', 'អេតមីន', 'Gp/lBVv1VTKk3DLGiENtX4Ow1xLEUqIDRBpa+zuTJWT3IIqfC4m0SB1tpVDo1+BQHFnY90XmvbJE1JAMDfRSmA$vkDevdjMM9v+/BonOi6HX/+v3Syh5mrSMXssz5707LSlOrCiIj3O7Q50bg7mLeCl6GYKhad7GGQi7CKvP1KqnbvtS2eZMFevVHsYHsQD2UeMQqiP7nAQ1z12ZHMNc5QckXZgUPMqetTzhJMzDduJ9+nOrC3HlqSo43VoMg0k+EA', '+85569639691', 'admin', '366a7028-b623-49b0-8988-d711647051a5');
+INSERT INTO public.core_user (user_id, created_date_time, created_user, status, updated_date_time, updated_user, email, first_name, first_name_oth, frc_usr_rst_pwd, identity_code, last_name, last_name_oth, password, phone, username, group_id) VALUES ('6c995713-eb3a-42a2-9284-a3bab6321a7b', '2021-06-13 10:57:37.015455', 'System', 'A', '2021-06-13 10:57:37.015455', 'System', 'public@localhost.com', 'Admin', '', 'N', '6396919', 'Public', '', '', '+85569639691', 'PUBLIC_USER', '366a7028-b623-49b0-8988-d711647051a5');
+
 
 INSERT INTO core_user_roles VALUES ('c6eff227-d496-486c-a72c-db2f92e06faa', '33525a14-0ebc-4a3e-ada5-bd3ef94c9495');
 
 INSERT INTO core_permission VALUES ('bdee9930-cbde-4e62-96d8-91df821a698b', NOW(), 'System', 'A', NOW(), 'System',
     'ad5ea55c-547a-4537-8797-e3714c64d8a3', '33525a14-0ebc-4a3e-ada5-bd3ef94c9495');
+
+INSERT INTO public.core_public_permission (public_perm_id, created_date_time, created_user, status, updated_date_time, updated_user, resource_id) VALUES ('87e3f5a1-bf97-42d3-ba8c-4efa86330e7d', '2026-04-26 13:23:34.000000', 'System', 'A', '2026-04-26 13:23:22.000000', 'System', 'b04ba160-1336-4aa1-8c9f-71b67cf7047d');
+
+INSERT INTO public.core_perm_allowed_method (public_perm_id, http_method) VALUES ('87e3f5a1-bf97-42d3-ba8c-4efa86330e7d', 'GET');
+
 ```
 
 Default credentials: `admin` / `admin` *(change immediately in production)*.
