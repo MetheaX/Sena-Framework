@@ -1,5 +1,6 @@
 package com.metheax.sena.api.config.security;
 
+import com.metheax.sena.api.domain.BaseAPIResponse;
 import com.metheax.sena.api.service.MetheaAuthenticationService;
 import com.metheax.sena.config.security.GrantedPermission;
 import com.metheax.sena.config.security.PrincipalAuthentication;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +28,6 @@ import tools.jackson.databind.json.JsonMapper;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,11 +104,11 @@ public class WebServiceAuthorizationFilter extends BasicAuthenticationFilter {
             if (!StringUtils.isEmpty(subject)) {
                 authentication = metheaAuthenticationService.loadUserByUsername(subject.split(MetheaConstant.COLON)[0]);
                 if (metheaAuthenticationService.validateUserRevokedToken(subject)) {
-                    constructUnAuthorizeResponse(res);
+                    constructUnAuthorizeResponse(res, false);
                     return;
                 }
             } else {
-                constructUnAuthorizeResponse(res);
+                constructUnAuthorizeResponse(res, false);
                 return;
             }
         }
@@ -134,7 +135,7 @@ public class WebServiceAuthorizationFilter extends BasicAuthenticationFilter {
                 isNotAuthorize = false;
             }
             if (isNotAuthorize) {
-                constructUnAuthorizeResponse(res);
+                constructUnAuthorizeResponse(res, true);
                 return;
             }
             SecurityContextHolder.getContext().setAuthentication(
@@ -143,13 +144,18 @@ public class WebServiceAuthorizationFilter extends BasicAuthenticationFilter {
         chain.doFilter(req, res);
     }
 
-    private void constructUnAuthorizeResponse(HttpServletResponse res) throws IOException {
-        Map<String, Object> map = new HashMap<>();
-        map.put("message", "Unauthorized Access!!");
-        map.put("status", 401);
+    private void constructUnAuthorizeResponse(HttpServletResponse res, boolean authenticated) throws IOException {
+        BaseAPIResponse apiResponse = new BaseAPIResponse();
+        if(authenticated) {
+            apiResponse.setMessage("No permission to access this resource.");
+            apiResponse.setStatus(HttpStatus.FORBIDDEN);
+        } else {
+            apiResponse.setMessage("Invalid token.");
+            apiResponse.setStatus(HttpStatus.UNAUTHORIZED);
+        }
 
         ObjectMapper mapper = JsonMapper.builder().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).build();
-        String jsonFormat = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(map);
+        String jsonFormat = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiResponse);
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         res.setContentType(MediaType.APPLICATION_JSON_VALUE);
         res.setContentLength(jsonFormat.length());
