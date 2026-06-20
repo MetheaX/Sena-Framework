@@ -62,7 +62,7 @@ class AuthenticationControllerTest {
                         .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("Access token generated!!!"))
+                .andExpect(jsonPath("$.message").value("Access token generated."))
                 .andExpect(jsonPath("$.token").exists());
     }
 
@@ -78,9 +78,9 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/auth/token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.message").value("Invalid account!!"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.message").value("Invalid username or password."));
     }
 
     @Test
@@ -95,7 +95,7 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/auth/token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isOk());
+                .andExpect(status().isInternalServerError());
     }
 
     // ---- POST /auth/refresh/token ----
@@ -130,9 +130,9 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/auth/refresh/token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.message").value("Invalid refresh token!!"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.message").value("Invalid refresh token."));
     }
 
     // ---- POST /auth/token/revoke ----
@@ -150,7 +150,7 @@ class AuthenticationControllerTest {
                         .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("Access token revoked!!!"));
+                .andExpect(jsonPath("$.message").value("Access token revoked."));
     }
 
     @Test
@@ -165,8 +165,8 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/auth/token/revoke")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.message").value("Failed to revoke access token!!"));
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.message").value("Failed to revoke access token. Please check system logs."));
     }
 }

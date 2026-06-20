@@ -1,11 +1,7 @@
 package com.metheax.sena.api.auth;
 
-import com.metheax.sena.api.domain.RefreshTokenPayload;
-import com.metheax.sena.api.domain.RequestTokenPayload;
-import com.metheax.sena.api.domain.Token;
+import com.metheax.sena.api.domain.*;
 import com.metheax.sena.api.service.MetheaAuthenticationService;
-import com.metheax.sena.api.domain.RevokeTokenPayload;
-import com.metheax.sena.constant.MetheaConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Author : Kuylim Tith
@@ -44,62 +38,65 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = GET_ACCESS_TOKEN_URL, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> generateTokenFromUser(@RequestBody RequestTokenPayload client, HttpServletRequest req) {
-        Map<String, Object> map = new HashMap<>();
+    public ResponseEntity<AccessTokenResponse> generateTokenFromUser(@RequestBody RequestTokenPayload client, HttpServletRequest req) {
+        AccessTokenResponse accessTokenResponse = new AccessTokenResponse();
         try {
             Token token = authenticationService.generateTokenFromUser(client, req);
-
             if (ObjectUtils.isEmpty(token)) {
-                map.put(MetheaConstant.JSON_MESSAGE, "Invalid account!!");
-                map.put(MetheaConstant.JSON_STATUS, 400);
-                return new ResponseEntity<>(map, HttpStatus.OK);
+                accessTokenResponse.setMessage("Invalid username or password.");
+                accessTokenResponse.setStatus(HttpStatus.UNAUTHORIZED);
+
+            } else {
+                accessTokenResponse.setToken(token);
+                accessTokenResponse.setMessage("Access token generated.");
+                accessTokenResponse.setStatus(HttpStatus.OK);
             }
-            map.put("token", token);
-            map.put(MetheaConstant.JSON_MESSAGE, "Access token generated!!!");
-            map.put(MetheaConstant.JSON_STATUS, 200);
         } catch (Exception ex) {
             log.error("=========> Generate access token from user error: ", ex);
+            accessTokenResponse.setMessage("Failed to generate access token. Please check system logs.");
+            accessTokenResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(map, HttpStatus.OK);
+        return new ResponseEntity<>(accessTokenResponse, accessTokenResponse.getHttpStatus());
     }
 
     @PostMapping(value = VERIFY_REFRESH_TOKEN, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> generateTokenFromRefreshToken(@RequestBody RefreshTokenPayload payload, HttpServletRequest req) {
+    public ResponseEntity<AccessTokenResponse> generateTokenFromRefreshToken(@RequestBody RefreshTokenPayload payload, HttpServletRequest req) {
         log.info("==========> start get access token form refresh token");
-        Map<String, Object> map = new HashMap<>();
+        AccessTokenResponse accessTokenResponse = new AccessTokenResponse();
 
         try {
             Token token = authenticationService.generateTokenFromRefreshToken(payload, req);
             if (ObjectUtils.isEmpty(token)) {
-                map.put(MetheaConstant.JSON_MESSAGE, "Invalid refresh token!!");
-                map.put(MetheaConstant.JSON_STATUS, 400);
-                return new ResponseEntity<>(map, HttpStatus.OK);
+                accessTokenResponse.setMessage("Invalid refresh token.");
+                accessTokenResponse.setStatus(HttpStatus.UNAUTHORIZED);
+            } else {
+                accessTokenResponse.setToken(token);
+                accessTokenResponse.setMessage("Access token generated.");
+                accessTokenResponse.setStatus(HttpStatus.OK);
             }
-            map.put("token", token);
-            map.put(MetheaConstant.JSON_MESSAGE, "Access token generated!!!");
-            map.put(MetheaConstant.JSON_STATUS, 200);
         } catch (Exception ex) {
             log.error("=========> Generate access token from refresh token error: ", ex);
+            accessTokenResponse.setMessage("Failed to generate access token. Please check system logs.");
+            accessTokenResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(map, HttpStatus.OK);
+        return new ResponseEntity<>(accessTokenResponse, accessTokenResponse.getHttpStatus());
     }
 
     @PostMapping(value = REVOKE_ACCESS_TOKEN_URL, produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> revokeAccessToken(@RequestBody RevokeTokenPayload payload,
+    public ResponseEntity<BaseAPIResponse> revokeAccessToken(@RequestBody RevokeTokenPayload payload,
                                                                  HttpServletRequest request) {
-        Map<String, Object> map = new HashMap<>();
+       BaseAPIResponse baseAPIResponse = new BaseAPIResponse();
 
         try {
             authenticationService.revokeAccessToken(payload, request);
-            map.put(MetheaConstant.JSON_MESSAGE, "Access token revoked!!!");
-            map.put(MetheaConstant.JSON_STATUS, 200);
+            baseAPIResponse.setMessage("Access token revoked.");
+            baseAPIResponse.setStatus(HttpStatus.OK);
         } catch (Exception ex) {
             log.error("=========> revokeAccessToken error: ", ex);
-            map.put(MetheaConstant.JSON_MESSAGE, "Failed to revoke access token!!");
-            map.put(MetheaConstant.JSON_STATUS, 400);
+            baseAPIResponse.setMessage("Failed to revoke access token. Please check system logs.");
+            baseAPIResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(map, HttpStatus.OK);
+        return new ResponseEntity<>(baseAPIResponse, baseAPIResponse.getHttpStatus());
     }
 }
