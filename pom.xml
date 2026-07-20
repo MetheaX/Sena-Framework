@@ -6,11 +6,12 @@
         <module>sena-core</module>
         <module>sena-auth</module>
         <module>sena-auth-app</module>
+        <module>sena-management-api</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.5</version>
+        <version>4.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.metheax.sena</groupId>
